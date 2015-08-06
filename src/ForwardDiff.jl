@@ -35,6 +35,7 @@ module ForwardDiff
     #     @eval import Base.$(fsym);
     # end
 
+    include("tuple_funcs.jl")
     include("ForwardDiffNum.jl")
     include("GradientNum.jl")
     include("HessianNum.jl")

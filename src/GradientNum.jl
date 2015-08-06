@@ -26,8 +26,6 @@ eltype{N,T}(::GradientNum{N,T}) = T
 npartials{N,T,C}(::Type{GradientNum{N,T,C}}) = N
 npartials{N}(::GradientNum{N}) = N
 
-include("grad/tuple_funcs.jl")
-
 zero_partials{N,T,C<:Tuple}(::Type{GradientNum{N,T,C}}) = zero_tuple(C)
 zero_partials{N,T,C<:Vector}(::Type{GradientNum{N,T,C}}) = zeros(T, N)
 rand_partials{N,T,C<:Tuple}(::Type{GradientNum{N,T,C}}) = rand_tuple(C)
@@ -103,5 +101,5 @@ to_nanmath(x) = x
 abs(g::GradientNum) = (value(g) >= 0) ? g : -g
 abs2(g::GradientNum) = g*g
 
-include("grad/gradtup_math.jl")
-include("grad/gradvec_math.jl")
+include("gradnum_math/gradtup_math.jl")
+include("gradnum_math/gradvec_math.jl")
