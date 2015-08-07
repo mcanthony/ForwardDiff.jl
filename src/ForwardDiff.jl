@@ -43,7 +43,8 @@ module ForwardDiff
     include("fad_api.jl")
     include("deprecated.jl")
 
-    export derivative!,
+    export wrt,
+           derivative!,
            derivative,
            gradient!,
            gradient,

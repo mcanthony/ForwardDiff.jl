@@ -1,4 +1,12 @@
-abstract Dim{N} # used to configure the input dimension of objective function
+abstract wrt{i}
+abstract dim{i}
+
+# resolve ambiguity warnings
+derivative{i}(::Type{wrt{i}}, x::Number) = error("derivative has no method derivative(::Type{wrt{i}}, x::Number)")
+gradient{i}(::Type{wrt{i}}, x::Vector) = error("gradient has no method gradient(::Type{wrt{i}}, x::Vector)")
+jacobian{i}(::Type{wrt{i}}, x::Vector) = error("jacobian has no method jacobian(::Type{wrt{i}}, x::Vector)")
+hessian{i}(::Type{wrt{i}}, x::Vector) = error("hessian has no method hessian(::Type{wrt{i}}, x::Vector)")
+tensor{i}(::Type{wrt{i}}, x::Vector) = error("tensor has no method tensor(::Type{wrt{i}}, x::Vector)")
 
 ######################
 # Taking Derivatives #
@@ -6,7 +14,7 @@ abstract Dim{N} # used to configure the input dimension of objective function
 
 # Load derivative from ForwardDiffNum #
 #-------------------------------------#
-function load_derivative!(arr::Array, output::Array)
+function load_derivative!(output::Array, arr::Array)
     @assert length(arr) == length(output)
     @simd for i in eachindex(output)
         @inbounds output[i] = grad(arr[i], 1)
@@ -14,20 +22,35 @@ function load_derivative!(arr::Array, output::Array)
     return output
 end
 
-load_derivative(arr::Array) = load_derivative!(arr, similar(arr, eltype(eltype(arr))))
+load_derivative(arr::Array) = load_derivative!(similar(arr, eltype(eltype(arr))), arr)
 load_derivative(n::ForwardDiffNum{1}) = grad(n, 1)
 
 # Derivative from function/Exposed API methods #
 #----------------------------------------------#
-derivative!(f, x::Number, output::Array) = load_derivative!(f(GradientNum(x, one(x))), output)
-derivative(f, x::Number) = load_derivative(f(GradientNum(x, one(x))))
 
-function derivative(f; mutates=false)
+@generated function calc_derivnum{N,i}(f, args::NTuple{N}, ::Type{wrt{i}})
+    f_args = wrt_args(N, :g, i)
+    return quote 
+        x = args[$i]
+        g = GradientNum(x, one(x))
+        return f($(f_args.args...))
+    end
+end
+
+derivative!{i}(Wrt::Type{wrt{i}}, output::Array, f, args...) = load_derivative!(output, calc_derivnum(f, args, Wrt))
+derivative!(output::Array, f, x::Number) = derivative!(wrt{1}, output, f, x)
+
+derivative{i}(Wrt::Type{wrt{i}}, f, args...) = load_derivative(calc_derivnum(f, args, Wrt))
+derivative(f, x::Number) = derivative(wrt{1}, f, x)
+
+function derivative(f; mutates::Bool=false)
     if mutates
-        derivf!(x::Number, output::Array) = derivative!(f, x, output)
+        derivf!(output::Array, x::Number) = derivative!(output, f, x)
+        derivf!{i}(Wrt::Type{wrt{i}}, output::Array, args...) = derivative!(Wrt, output, f, args...)
         return derivf!
     else
         derivf(x::Number) = derivative(f, x)
+        derivf{i}(Wrt::Type{wrt{i}}, args...) = derivative(Wrt, f, args...)
         return derivf
     end
 end
@@ -38,7 +61,7 @@ end
 
 # Load gradient from ForwardDiffNum #
 #-----------------------------------#
-function load_gradient!(n::ForwardDiffNum, output::Vector)
+function load_gradient!(output::Vector, n::ForwardDiffNum)
     @assert npartials(n) == length(output) "The output vector must be the same length as the input vector"
     @simd for i in eachindex(output)
         @inbounds output[i] = grad(n, i)
@@ -46,43 +69,64 @@ function load_gradient!(n::ForwardDiffNum, output::Vector)
     return output
 end
 
-load_gradient{N,T,C}(n::ForwardDiffNum{N,T,C}) = load_gradient!(n, Array(T, N))
+load_gradient{N,T,C}(n::ForwardDiffNum{N,T,C}) = load_gradient!(Array(T, N), n)
 
 # Gradient from function #
 #------------------------#
-function calc_gradnum!{N,T,C}(f,
-                              x::Vector{T},
-                              gradvec::Vector{GradientNum{N,T,C}}) 
-    Grad = eltype(gradvec)
-
+function load_gradvec!{N,T,C}(gradvec::Vector{GradientNum{N,T,C}}, x::Vector{T})
+    G = eltype(gradvec)
+    
     @assert length(x) == N "Length of input must be equal to the number of partials components used"
     @assert length(gradvec) == N "The GradientNum vector must be the same length as the input vector"
 
-    pchunk = partials_chunk(Grad)
+    pchunk = partials_chunk(G)
 
     @simd for i in eachindex(gradvec)
-        @inbounds gradvec[i] = Grad(x[i], pchunk[i])
+        @inbounds gradvec[i] = G(x[i], pchunk[i])
     end
 
-    return f(gradvec)
+    return gradvec
 end
 
-take_gradient!(f, x::Vector, output::Vector, gradvec::Vector) = load_gradient!(calc_gradnum!(f, x, gradvec), output)
-take_gradient!(f, x::Vector, gradvec::Vector) = load_gradient(calc_gradnum!(f, x, gradvec))
-take_gradient!{T,D<:Dim}(f, x::Vector{T}, output::Vector, ::Type{D}) = take_gradient!(f, x, output, grad_workvec(D, T))
-take_gradient{T,D<:Dim}(f, x::Vector{T}, ::Type{D}) = take_gradient!(f, x, grad_workvec(D, T))
+function take_gradient!{i}(output::Vector, f, args::Tuple, Wrt::Type{wrt{i}}, gradvec::Vector)
+    return load_gradient!(output, calc_fadnum!(f, args, Wrt, gradvec, load_gradvec!))
+end
+
+function take_gradient!{i,d}(output::Vector, f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_gradient!(output, f, args, Wrt, grad_workvec(Dim, eltype(args[i])))
+end
+
+function take_gradient!{i}(f, args::Tuple, Wrt::Type{wrt{i}}, gradvec::Vector)
+    return load_gradient(calc_fadnum!(f, args, Wrt, gradvec, load_gradvec!))
+end
+
+function take_gradient{i,d}(f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_gradient!(f, args, Wrt, grad_workvec(Dim, eltype(args[i])))
+end
 
 # Exposed API methods #
 #---------------------#
-gradient!{T,S}(f, x::Vector{T}, output::Vector{S}) = take_gradient!(f, x, output, Dim{length(x)})::Vector{S}
-gradient{T,S}(f, x::Vector{T}, ::Type{S}=T) = take_gradient(f, x, Dim{length(x)})::Vector{S}
+function gradient!{T,i}(Wrt::Type{wrt{i}}, output::Vector{T}, f, args...)
+    return take_gradient!(output, f, args, Wrt, dim{length(args[i])})::Vector{T}
+end
 
-function gradient(f; mutates=false)
+gradient!{T}(output::Vector{T}, f, x::Vector) = gradient!(wrt{1}, output, f, x)
+
+function gradient{i}(Wrt::Type{wrt{i}}, f, args...)
+    x = args[i]
+    return take_gradient(f, args, Wrt, dim{length(x)})::Vector{eltype(x)}
+end
+
+gradient(f, x::Vector) = gradient(wrt{1}, f, x)
+
+function gradient(f; mutates::Bool=false)
     if mutates
-        gradf!(x::Vector, output::Vector) = gradient!(f, x, output)
+        gradf!(output::Vector, x::Vector) = gradient!(output, f, x)
+        gradf!{i}(Wrt::Type{wrt{i}}, output::Vector, args...) = gradient!(Wrt, output, f, args...)
         return gradf!
     else
-        gradf{T,S}(x::Vector{T}, ::Type{S}=T) = gradient(f, x, S)
+        gradf(x::Vector) = gradient(f, x)
+        gradf{i}(Wrt::Type{wrt{i}}, args...) = gradient(Wrt, f, args...)
         return gradf
     end
 end
@@ -93,7 +137,7 @@ end
 
 # Load Jacobian from ForwardDiffNum #
 #-----------------------------------#
-function load_jacobian!(jacvec::Vector, output)
+function load_jacobian!(output, jacvec::Vector)
     # assumes jacvec is actually homogenous,
     # though it may not be well-inferenced.
     N = npartials(first(jacvec))
@@ -107,44 +151,50 @@ function load_jacobian(jacvec::Vector)
     # assumes jacvec is actually homogenous,
     # though it may not be well-inferenced.
     F = typeof(first(jacvec))
-    return load_jacobian!(jacvec, Array(eltype(F), length(jacvec), npartials(F)))
+    return load_jacobian!(Array(eltype(F), length(jacvec), npartials(F)), jacvec)
 end
 
 # Jacobian from function #
 #------------------------#
-function calc_jacnum!{N,T,C}(f,
-                             x::Vector{T},
-                             gradvec::Vector{GradientNum{N,T,C}})
-    Grad = eltype(gradvec)
-
-    @assert length(x) == N "Length of input must be equal to the number of partials components used"
-    @assert length(gradvec) == N "The GradientNum vector must be the same length as the input vector"
-
-    pchunk = partials_chunk(Grad)
-
-    @simd for i in eachindex(gradvec)
-       @inbounds gradvec[i] = Grad(x[i], pchunk[i])
-    end
-
-    return f(gradvec)
+function take_jacobian!{i}(output::Matrix, f, args::Tuple, Wrt::Type{wrt{i}}, gradvec::Vector)
+    return load_jacobian!(output, calc_fadnum!(f, args, Wrt, gradvec, load_gradvec!))
 end
 
-take_jacobian!(f, x::Vector, output::Matrix, gradvec::Vector) = load_jacobian!(calc_jacnum!(f, x, gradvec), output)
-take_jacobian!(f, x::Vector, gradvec::Vector) = load_jacobian(calc_jacnum!(f, x, gradvec))
-take_jacobian!{T,D<:Dim}(f, x::Vector{T}, output::Matrix, ::Type{D}) = take_jacobian!(f, x, output, grad_workvec(D, T))
-take_jacobian{T,D<:Dim}(f, x::Vector{T}, ::Type{D}) = take_jacobian!(f, x, grad_workvec(D, T))
+function take_jacobian!{i,d}(output::Matrix, f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_jacobian!(output, f, args, Wrt, grad_workvec(Dim, eltype(args[i])))
+end
+
+function take_jacobian!{i}(f, args::Tuple, Wrt::Type{wrt{i}}, gradvec::Vector)
+    return load_jacobian(calc_fadnum!(f, args, Wrt, gradvec, load_gradvec!))
+end
+
+function take_jacobian{i,d}(f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_jacobian!(f, args, Wrt, grad_workvec(Dim, eltype(args[i])))
+end
 
 # Exposed API methods #
 #---------------------#
-jacobian!{T}(f, x::Vector{T}, output::Matrix{T}) = take_jacobian!(f, x, output, Dim{length(x)})::Matrix{T}
-jacobian{T,S}(f, x::Vector{T}, ::Type{S}=T) = take_jacobian(f, x, Dim{length(x)})::Matrix{S}
+function jacobian!{T,i}(Wrt::Type{wrt{i}}, output::Matrix{T}, f, args...)
+    return take_jacobian!(output, f, args, Wrt, dim{length(args[i])})::Matrix{T}
+end
 
-function jacobian(f; mutates=false)
+jacobian!{T}(output::Matrix{T}, f, x::Vector) = jacobian!(wrt{1}, output, f, x)
+
+function jacobian{i}(Wrt::Type{wrt{i}}, f, args...)
+    x = args[i]
+    return take_jacobian(f, args, Wrt, dim{length(x)})::Matrix{eltype(x)}
+end
+
+jacobian(f, x::Vector) = jacobian(wrt{1}, f, x)
+
+function jacobian(f; mutates::Bool=false)
     if mutates
-        jacf!(x::Vector, output::Matrix) = jacobian!(f, x, output)
+        jacf!(output::Matrix, x::Vector) = jacobian!(output, f, x)
+        jacf!{i}(Wrt::Type{wrt{i}}, output::Matrix, args...) = jacobian!(Wrt, output, f, args...)
         return jacf!
     else
-        jacf{T,S}(x::Vector{T}, ::Type{S}=T) = jacobian(f, x, S)
+        jacf(x::Vector) = jacobian(f, x)
+        jacf{i}(Wrt::Type{wrt{i}}, args...) = jacobian(Wrt, f, args...)
         return jacf
     end
 end
@@ -155,7 +205,7 @@ end
 
 # Load Hessian from ForwardDiffNum #
 #----------------------------------#
-function load_hessian!{N}(n::ForwardDiffNum{N}, output)
+function load_hessian!{N}(output, n::ForwardDiffNum{N})
     @assert (N, N) == size(output) "The output matrix must have size (length(input), length(input))"
     q = 1
     for i in 1:N
@@ -169,44 +219,65 @@ function load_hessian!{N}(n::ForwardDiffNum{N}, output)
     return output
 end
 
-load_hessian{N,T}(n::ForwardDiffNum{N,T}) = load_hessian!(n, Array(T, N, N))
+load_hessian{N,T}(n::ForwardDiffNum{N,T}) = load_hessian!(Array(T, N, N), n)
 
 # Hessian from function #
 #-----------------------#
-function calc_hessnum!{N,T,C}(f,
-                              x::Vector{T},
-                              hessvec::Vector{HessianNum{N,T,C}}) 
-    Grad = GradientNum{N,T,C}
+function load_hessvec!{N,T,C}(hessvec::Vector{HessianNum{N,T,C}}, x::Vector{T}) 
+    G = GradientNum{N,T,C}
 
     @assert length(x) == N "Length of input must be equal to the number of partials components used"
     @assert length(hessvec) == N "The HessianNum vector must be the same length as the input vector"
 
-    pchunk = partials_chunk(Grad)
+    pchunk = partials_chunk(G)
     zhess = zero_partials(eltype(hessvec))
 
     @simd for i in eachindex(hessvec)
-        @inbounds hessvec[i] = HessianNum(Grad(x[i], pchunk[i]), zhess)
+        @inbounds hessvec[i] = HessianNum(G(x[i], pchunk[i]), zhess)
     end
 
-    return f(hessvec)
+    return hessvec
 end
 
-take_hessian!(f, x::Vector, output::Matrix, hessvec::Vector) = load_hessian!(calc_hessnum!(f, x, hessvec), output)
-take_hessian!(f, x::Vector, hessvec::Vector) = load_hessian(calc_hessnum!(f, x, hessvec))
-take_hessian!{T,D<:Dim}(f, x::Vector{T}, output::Matrix, ::Type{D}) = take_hessian!(f, x, output, hess_workvec(D, T))
-take_hessian{T,D<:Dim}(f, x::Vector{T}, ::Type{D}) = take_hessian!(f, x, hess_workvec(D, T))
+function take_hessian!{i}(output::Matrix, f, args::Tuple, Wrt::Type{wrt{i}}, hessvec::Vector)
+    return load_hessian!(output, calc_fadnum!(f, args, Wrt, hessvec, load_hessvec!))
+end
+
+function take_hessian!{i,d}(output::Matrix, f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_hessian!(output, f, args, Wrt, hess_workvec(Dim, eltype(args[i])))
+end
+
+function take_hessian!{i}(f, args::Tuple, Wrt::Type{wrt{i}}, hessvec::Vector)
+    return load_hessian(calc_fadnum!(f, args, Wrt, hessvec, load_hessvec!))
+end
+
+function take_hessian{i,d}(f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_hessian!(f, args, Wrt, hess_workvec(Dim, eltype(args[i])))
+end
 
 # Exposed API methods #
 #---------------------#
-hessian!{T,S}(f, x::Vector{T}, output::Matrix{S}) = take_hessian!(f, x, output, Dim{length(x)})::Matrix{S}
-hessian{T,S}(f, x::Vector{T}, ::Type{S}=T) = take_hessian(f, x, Dim{length(x)})::Matrix{S}
+function hessian!{T,i}(Wrt::Type{wrt{i}}, output::Matrix{T}, f, args...)
+    return take_hessian!(output, f, args, Wrt, dim{length(args[i])})::Matrix{T}
+end
 
-function hessian(f; mutates=false)
+hessian!{T}(output::Matrix{T}, f, x::Vector) = hessian!(wrt{1}, output, f, x)
+
+function hessian{i}(Wrt::Type{wrt{i}}, f, args...)
+    x = args[i]
+    return take_hessian(f, args, Wrt, dim{length(x)})::Matrix{eltype(x)}
+end
+
+hessian(f, x::Vector) = hessian(wrt{1}, f, x)
+
+function hessian(f; mutates::Bool=false)
     if mutates
-        hessf!(x::Vector, output::Matrix) = hessian!(f, x, output)
+        hessf!(output::Matrix, x::Vector) = hessian!(output, f, x)
+        hessf!{i}(Wrt::Type{wrt{i}}, output::Matrix, args...) = hessian!(Wrt, output, f, args...)
         return hessf!
     else
-        hessf{T,S}(x::Vector{T}, ::Type{S}=T) = hessian(f, x, S)
+        hessf(x::Vector) = hessian(f, x)
+        hessf{i}(Wrt::Type{wrt{i}}, args...) = hessian(Wrt, f, args...)
         return hessf
     end
 end
@@ -217,7 +288,7 @@ end
 
 # Load Tensor from ForwardDiffNum #
 #---------------------------------#
-function load_tensor!{N,T,C}(n::ForwardDiffNum{N,T,C}, output)
+function load_tensor!{N,T,C}(output, n::ForwardDiffNum{N,T,C})
     @assert (N, N, N) == size(output) "The output array must have size (length(input), length(input), length(input))"
     
     q = 1
@@ -251,45 +322,67 @@ function load_tensor!{N,T,C}(n::ForwardDiffNum{N,T,C}, output)
     return output
 end
 
-load_tensor{N,T,C}(n::ForwardDiffNum{N,T,C}) = load_tensor!(n, Array(T, N, N, N))
+load_tensor{N,T,C}(n::ForwardDiffNum{N,T,C}) = load_tensor!(Array(T, N, N, N), n)
 
 # Tensor from function #
 #----------------------#
-function calc_tensnum!{N,T,C}(f,
-                              x::Vector{T},
-                              tensvec::Vector{TensorNum{N,T,C}}) 
-    Grad = GradientNum{N,T,C}
+function load_tensvec!{N,T,C}(tensvec::Vector{TensorNum{N,T,C}}, x::Vector{T}) 
+    G = GradientNum{N,T,C}
+    H = HessianNum{N,T,C}
 
     @assert length(x) == N "Length of input must be equal to the number of partials components used"
     @assert length(tensvec) == N "The TensorNum vector must be the same length as the input"
 
-    pchunk = partials_chunk(Grad)
-    zhess = zero_partials(HessianNum{N,T,C})
+    pchunk = partials_chunk(G)
+    zhess = zero_partials(H)
     ztens = zero_partials(eltype(tensvec))
 
     @simd for i in eachindex(tensvec)
-        @inbounds tensvec[i] = TensorNum(HessianNum(Grad(x[i], pchunk[i]), zhess), ztens)
+        @inbounds tensvec[i] = TensorNum(H(G(x[i], pchunk[i]), zhess), ztens)
     end
 
-    return f(tensvec)
+    return tensvec
 end
 
-take_tensor!{S}(f, x::Vector, output::Array{S,3}, tensvec::Vector) = load_tensor!(calc_tensnum!(f, x, tensvec), output)
-take_tensor!(f, x::Vector, tensvec::Vector) = load_tensor(calc_tensnum!(f, x, tensvec))
-take_tensor!{T,S,D<:Dim}(f, x::Vector{T}, output::Array{S,3}, ::Type{D}) = take_tensor!(f, x, output, tens_workvec(D, T))
-take_tensor{T,D<:Dim}(f, x::Vector{T}, ::Type{D}) = take_tensor!(f, x, tens_workvec(D, T))
+function take_tensor!{T,i}(output::Array{T,3}, f, args::Tuple, Wrt::Type{wrt{i}}, tensvec::Vector)
+    return load_tensor!(output, calc_fadnum!(f, args, Wrt, tensvec, load_tensvec!))
+end
+
+function take_tensor!{T,i,d}(output::Array{T,3}, f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_tensor!(output, f, args, Wrt, tens_workvec(Dim, eltype(args[i])))
+end
+
+function take_tensor!{i}(f, args::Tuple, Wrt::Type{wrt{i}}, tensvec::Vector)
+    return load_tensor(calc_fadnum!(f, args, Wrt, tensvec, load_tensvec!))
+end
+
+function take_tensor{i,d}(f, args::Tuple, Wrt::Type{wrt{i}}, Dim::Type{dim{d}})
+    return take_tensor!(f, args, Wrt, tens_workvec(Dim, eltype(args[i])))
+end
 
 # Exposed API methods #
 #---------------------#
-tensor!{T,S}(f, x::Vector{T}, output::Array{S,3}) = take_tensor!(f, x, output, Dim{length(x)})::Array{S,3}
-tensor{T,S}(f, x::Vector{T}, ::Type{S}=T) = take_tensor(f, x, Dim{length(x)})::Array{S,3}
+function tensor!{T,i}(Wrt::Type{wrt{i}}, output::Array{T,3}, f, args...)
+    return take_tensor!(output, f, args, Wrt, dim{length(args[i])})::Array{T,3}
+end
 
-function tensor(f; mutates=false)
+tensor!{T}(output::Array{T,3}, f, x::Vector) = tensor!(wrt{1}, output, f, x)
+
+function tensor{i}(Wrt::Type{wrt{i}}, f, args...)
+    x = args[i]
+    return take_tensor(f, args, Wrt, dim{length(x)})::Array{eltype(x),3}
+end
+
+tensor(f, x::Vector) = tensor(wrt{1}, f, x)
+
+function tensor(f; mutates::Bool=false)
     if mutates
-        tensf!{T}(x::Vector, output::Array{T,3}) = tensor!(f, x, output)
+        tensf!{T}(output::Array{T,3}, x::Vector) = tensor!(output, f, x)
+        tensf!{T,i}(Wrt::Type{wrt{i}}, output::Array{T,3}, args...) = tensor!(Wrt, output, f, args...)
         return tensf!
     else
-        tensf{T,S}(x::Vector{T}, ::Type{S}=T) = tensor(f, x, S)
+        tensf(x::Vector) = tensor(f, x)
+        tensf{i}(Wrt::Type{wrt{i}}, args...) = tensor(Wrt, f, args...)
         return tensf
     end
 end
@@ -310,7 +403,26 @@ end
 # though I can't think of any use cases in which that would be 
 # relevant.
 
-@generated function pick_implementation{N,T}(::Type{Dim{N}}, ::Type{T})
+# Load the input vector into a ForwardDiffNum vector using 
+# load_func!, then pass the loaded work vector + args through f.
+@generated function calc_fadnum!{N,i}(f, 
+                                        args::NTuple{N}, 
+                                        ::Type{wrt{i}}, 
+                                        workvec::Vector, 
+                                        load_func!::Function)
+    f_args = wrt_args(N, :workvec, i)
+    return quote 
+        x = args[$i]
+        workvec = load_func!(workvec, x)
+        return f($(f_args.args...))
+    end
+end
+
+function wrt_args(N::Int, item::Symbol, wrt::Int)
+    return Expr(:tuple, [i == wrt ? item : :(args[$i]) for i=1:N]...)
+end
+
+@generated function pick_implementation{N,T}(::Type{dim{N}}, ::Type{T})
     if N > 10
         return :(Vector{$T})
     else
@@ -318,18 +430,18 @@ end
     end
 end
 
-@generated function grad_workvec{N,T}(::Type{Dim{N}}, ::Type{T})
-    result = Vector{GradientNum{N,T,pick_implementation(Dim{N},T)}}(N)
+@generated function grad_workvec{N,T}(::Type{dim{N}}, ::Type{T})
+    result = Vector{GradientNum{N,T,pick_implementation(dim{N},T)}}(N)
     return :($result)
 end
 
-@generated function hess_workvec{N,T}(::Type{Dim{N}}, ::Type{T})
-    result = Vector{HessianNum{N,T,pick_implementation(Dim{N},T)}}(N)
+@generated function hess_workvec{N,T}(::Type{dim{N}}, ::Type{T})
+    result = Vector{HessianNum{N,T,pick_implementation(dim{N},T)}}(N)
     return :($result)
 end
 
-@generated function tens_workvec{N,T}(::Type{Dim{N}}, ::Type{T})
-    result = Vector{TensorNum{N,T,pick_implementation(Dim{N},T)}}(N)
+@generated function tens_workvec{N,T}(::Type{dim{N}}, ::Type{T})
+    result = Vector{TensorNum{N,T,pick_implementation(dim{N},T)}}(N)
     return :($result)
 end
 
