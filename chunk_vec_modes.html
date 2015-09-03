@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Chunk-mode vs. Vector-mode &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Accessing Lower-Order Results" href="lower_order_results.html"/>
+        <link rel="prev" title="Performing Differentiation" href="perf_diff.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="index.html" class="icon icon-home"> ForwardDiff.jl
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#gradients">Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#jacobians">Jacobians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#hessians">Hessians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#tensors">Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Chunk-mode vs. Vector-mode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-are-these-modes">What are these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-use-these-modes">How do I use these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-mode-chunk-size-should-i-use">What mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> should I use?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lower_order_results.html">Accessing Lower-Order Results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-wrong-way">The Wrong Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-right-way">The Right Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#what-you-can-extract-from-a-forwarddiffresult">What You Can Extract from a <code class="docutils literal"><span class="pre">ForwardDiffResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#when-does-caching-matter">When Does Caching Matter?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="perf_tips.html">Performance Tips</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul class="simple">
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ForwardDiff.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Chunk-mode vs. Vector-mode</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/chunk_vec_modes.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="chunk-mode-vs-vector-mode">
+<h1>Chunk-mode vs. Vector-mode<a class="headerlink" href="#chunk-mode-vs-vector-mode" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-are-these-modes">
+<h2>What are these modes?<a class="headerlink" href="#what-are-these-modes" title="Permalink to this headline">¶</a></h2>
+<p>By default, ForwardDiff.jl operates over the entire input vector simultaneously when evaluating partial derivatives. This mode, called <strong>vector-mode</strong>, minimizes the number of calls to the target function <span class="math">\(f\)</span>, but does so at a potentially high memory cost. As such, vector-mode is quite suitable for <em>small</em> input vectors, but <em>large</em> input vectors can incur heavy GC overhead.</p>
+<p>To get around this problem, ForwardDiff.jl provides <strong>chunk-mode</strong>. In chunk-mode, partial derivative evaluation is performed on one &#8220;chunk&#8221; of the input vector at a time. This results in more calls to <span class="math">\(f\)</span>, but requires less memory and thus incurs less GC overhead.</p>
+</div>
+<div class="section" id="how-do-i-use-these-modes">
+<h2>How do I use these modes?<a class="headerlink" href="#how-do-i-use-these-modes" title="Permalink to this headline">¶</a></h2>
+<p>The user doesn&#8217;t have to do anything to use vector-mode, since it is used by default.</p>
+<p>To use chunk-mode, simply pass in a <code class="docutils literal"><span class="pre">chunk_size</span></code> keyword argument to any of ForwardDiff.jl&#8217;s differentiation methods (except <code class="docutils literal"><span class="pre">tensor</span></code>/<code class="docutils literal"><span class="pre">tensor!</span></code>, for which chunk-mode is not yet supported):</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">ForwardDiff</span>
+
+<span class="c"># let&#39;s use a Rosenbrock function as our target function</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="k">function</span><span class="nf"> rosenbrock</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+           <span class="n">a</span> <span class="o">=</span> <span class="n">one</span><span class="p">(</span><span class="n">eltype</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+           <span class="n">b</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">a</span>
+           <span class="n">result</span> <span class="o">=</span> <span class="n">zero</span><span class="p">(</span><span class="n">eltype</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+               <span class="n">result</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+           <span class="k">end</span>
+           <span class="k">return</span> <span class="n">result</span>
+       <span class="k">end</span>
+<span class="n">rosenbrock</span> <span class="p">(</span><span class="n">generic</span> <span class="k">function</span><span class="nf"> with</span> <span class="mi">1</span> <span class="n">method</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">16000</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="p">@</span><span class="n">time</span> <span class="n">g</span><span class="p">(</span><span class="n">x</span><span class="p">);</span> <span class="c"># in reality, this is a post-warmup result</span>
+<span class="mf">2.895158</span> <span class="n">seconds</span> <span class="p">(</span><span class="mf">655.99</span> <span class="n">k</span> <span class="n">allocations</span><span class="p">:</span> <span class="mf">15.274</span> <span class="n">GB</span><span class="p">,</span> <span class="mf">17.45</span><span class="o">%</span> <span class="n">gc</span> <span class="n">time</span><span class="p">)</span>
+
+<span class="c"># g_chunk will only calculate 5 elements at a time to save memory</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">g_chunk</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="p">@</span><span class="n">time</span> <span class="n">g_chunk</span><span class="p">(</span><span class="n">x</span><span class="p">);</span> <span class="c"># also post-warmup</span>
+<span class="mf">0.651275</span> <span class="n">seconds</span> <span class="p">(</span><span class="mf">6.42</span> <span class="n">k</span> <span class="n">allocations</span><span class="p">:</span> <span class="mf">525.641</span> <span class="n">KB</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the provided <code class="docutils literal"><span class="pre">chunk_size</span></code> must always evenly divide the length of the input vector:</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="n">hessian</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ERROR</span><span class="p">:</span> <span class="n">AssertionError</span><span class="p">:</span> <span class="n">Length</span> <span class="n">of</span> <span class="n">input</span> <span class="n">vector</span> <span class="nb">is</span> <span class="n">indivisible</span> <span class="n">by</span> <span class="n">chunk</span> <span class="n">size</span> <span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">chunk</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We&#8217;re currently working on removing this limitation so that input vectors with prime lengths won&#8217;t be at a disadvantage.</p>
+</div>
+<div class="section" id="what-mode-chunk-size-should-i-use">
+<h2>What mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> should I use?<a class="headerlink" href="#what-mode-chunk-size-should-i-use" title="Permalink to this headline">¶</a></h2>
+<p>The best mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> for any given problem is heavily dependent on the target function and length of the input vector. As such, one should generally perform their own benchmarks to determine whether to use vector-mode or chunk-mode (or to pick the appropriate <code class="docutils literal"><span class="pre">chunk_size</span></code>).</p>
+<p>Here are some tips:</p>
+<ul class="simple">
+<li>If your input vector is large (over ~1000 elements), consider using chunk-mode.</li>
+<li>If you find that a large portion of calculation time can be attributed to GC, consider using chunk-mode.</li>
+<li>The sweet spot for <code class="docutils literal"><span class="pre">chunk_size</span></code> will usually be between 1 and ~10, because calculations on large chunks can &#8220;clog&#8221; the stack. This behavior is due to ForwardDiff.jl&#8217;s reliance on stack-allocated tuples for chunk-mode.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lower_order_results.html" class="btn btn-neutral float-right" title="Accessing Lower-Order Results" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="perf_diff.html" class="btn btn-neutral" title="Performing Differentiation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jarrett Revels, Miles Lubin, Theodore Papamarkou.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

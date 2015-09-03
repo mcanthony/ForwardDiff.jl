@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Performing Differentiation &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Chunk-mode vs. Vector-mode" href="chunk_vec_modes.html"/>
+        <link rel="prev" title="Installation and Version Requirements" href="install.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="index.html" class="icon icon-home"> ForwardDiff.jl
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#derivatives">Derivatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gradients">Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jacobians">Jacobians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hessians">Hessians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tensors">Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chunk_vec_modes.html">Chunk-mode vs. Vector-mode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-are-these-modes">What are these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#how-do-i-use-these-modes">How do I use these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-mode-chunk-size-should-i-use">What mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> should I use?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lower_order_results.html">Accessing Lower-Order Results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-wrong-way">The Wrong Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-right-way">The Right Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#what-you-can-extract-from-a-forwarddiffresult">What You Can Extract from a <code class="docutils literal"><span class="pre">ForwardDiffResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#when-does-caching-matter">When Does Caching Matter?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="perf_tips.html">Performance Tips</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul class="simple">
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ForwardDiff.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Performing Differentiation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/perf_diff.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="performing-differentiation">
+<h1>Performing Differentiation<a class="headerlink" href="#performing-differentiation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="derivatives">
+<h2>Derivatives<a class="headerlink" href="#derivatives" title="Permalink to this headline">¶</a></h2>
+<p>ForwardDiff.jl can take derivatives of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Number)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code> or <code class="docutils literal"><span class="pre">f(x::Number)</span></code> → <code class="docutils literal"><span class="pre">Array</span></code>.</p>
+<dl class="function">
+<dt>
+<code class="descname">derivative!(output::Array, f, x::Number)</code></dt>
+<dd><p>Compute <span class="math">\(f'(x)\)</span>, storing the output in <code class="docutils literal"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="derivative">
+<code class="descname">derivative</code><span class="sig-paren">(</span><em>f</em>, <em>x::Number</em><span class="sig-paren">)</span><a class="headerlink" href="#derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute <span class="math">\(f'(x)\)</span>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">derivative</code><span class="sig-paren">(</span><em>f; mutates=false</em><span class="sig-paren">)</span></dt>
+<dd><p>Return the function <span class="math">\(f'\)</span>. If <code class="docutils literal"><span class="pre">mutates=false</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">d(x)</span></code>. If <code class="docutils literal"><span class="pre">mutates=true</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">d!(output,</span> <span class="pre">x)</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="gradients">
+<h2>Gradients<a class="headerlink" href="#gradients" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When calling ForwardDiff.jl&#8217;s <code class="docutils literal"><span class="pre">gradient</span></code> method, you must use the fully qualified method name <code class="docutils literal"><span class="pre">ForwardDiff.gradient(...)</span></code> in order to avoid conflict with <code class="docutils literal"><span class="pre">Base.gradient</span></code>.</p>
+</div>
+<p>ForwardDiff.jl can take gradients of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Vector)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code>.</p>
+<dl class="function">
+<dt>
+<code class="descname">gradient!(output::Vector, f, x::Vector)</code></dt>
+<dd><p>Compute <span class="math">\(\nabla f(\vec{x})\)</span>, storing the output in <code class="docutils literal"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">ForwardDiff.gradient{S}(f, x::Vector{S})</code></dt>
+<dd><p>Compute <span class="math">\(\nabla f(\vec{x})\)</span>, where <code class="docutils literal"><span class="pre">S</span></code> is the element type of both the input and output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ForwardDiff.gradient">
+<code class="descclassname">ForwardDiff.</code><code class="descname">gradient</code><span class="sig-paren">(</span><em>f; mutates=false</em><span class="sig-paren">)</span><a class="headerlink" href="#ForwardDiff.gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the function <span class="math">\(\nabla f\)</span>. If <code class="docutils literal"><span class="pre">mutates=false</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">g(x)</span></code>. If <code class="docutils literal"><span class="pre">mutates=true</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">g!(output,</span> <span class="pre">x)</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="jacobians">
+<h2>Jacobians<a class="headerlink" href="#jacobians" title="Permalink to this headline">¶</a></h2>
+<p>ForwardDiff.jl can take Jacobians of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x:Vector)</span></code> → <code class="docutils literal"><span class="pre">Vector</span></code>.</p>
+<dl class="function">
+<dt>
+<code class="descname">jacobian!(output::Matrix, f, x::Vector)</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{J}(f)(\vec{x})\)</span>, storing the output in <code class="docutils literal"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">jacobian{S}(f, x::Vector{S})</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{J}(f)(\vec{x})\)</span>, where <code class="docutils literal"><span class="pre">S</span></code> is the element type of both the input and output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="jacobian">
+<code class="descname">jacobian</code><span class="sig-paren">(</span><em>f; mutates=false</em><span class="sig-paren">)</span><a class="headerlink" href="#jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the function <span class="math">\(\mathbf{J}(f)\)</span>. If <code class="docutils literal"><span class="pre">mutates=false</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">j(x)</span></code>. If <code class="docutils literal"><span class="pre">mutates=true</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">j!(output,</span> <span class="pre">x)</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="hessians">
+<h2>Hessians<a class="headerlink" href="#hessians" title="Permalink to this headline">¶</a></h2>
+<p>ForwardDiff.jl can take Hessians of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Vector)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code>.</p>
+<dl class="function">
+<dt>
+<code class="descname">hessian!(output::Matrix, f, x::Vector)</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{H}(f)(\vec{x})\)</span>, storing the output in <code class="docutils literal"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">hessian{S}(f, x::Vector{S})</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{H}(f)(\vec{x})\)</span>, where <code class="docutils literal"><span class="pre">S</span></code> is the element type of both the input and output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hessian">
+<code class="descname">hessian</code><span class="sig-paren">(</span><em>f; mutates=false</em><span class="sig-paren">)</span><a class="headerlink" href="#hessian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the function <span class="math">\(\mathbf{H}(f)\)</span>. If <code class="docutils literal"><span class="pre">mutates=false</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">h(x)</span></code>. If <code class="docutils literal"><span class="pre">mutates=true</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">h!(output,</span> <span class="pre">x)</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tensors">
+<h2>Tensors<a class="headerlink" href="#tensors" title="Permalink to this headline">¶</a></h2>
+<p>ForwardDiff.jl can take Tensors of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Vector)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code>.</p>
+<p>&#8220;Tensor&#8221;, in this context, refers to a <span class="math">\(3^{\text{rd}}\)</span> order generalization of the Hessian. Given a function <span class="math">\(f:\mathbb{R}^n \to \mathbb{R}\)</span>, the Tensor operator <span class="math">\(\mathbf{T}\)</span> is defined as</p>
+<div class="math">
+\[\mathbf{T}(f) = \sum_{i,j,k=1}^{n} \frac{\delta^3 f}{\delta x_i \delta x_j \delta x_k}\]</div>
+<dl class="function">
+<dt>
+<code class="descname">tensor!(output::Matrix, f, x::Vector)</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{T}(f)(\vec{x})\)</span>, storing the output in <code class="docutils literal"><span class="pre">output</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">tensor{S}(f, x::Vector{S})</code></dt>
+<dd><p>Compute <span class="math">\(\mathbf{T}(f)(\vec{x})\)</span>, where <code class="docutils literal"><span class="pre">S</span></code> is the element type of both the input and output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tensor">
+<code class="descname">tensor</code><span class="sig-paren">(</span><em>f; mutates=false</em><span class="sig-paren">)</span><a class="headerlink" href="#tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the function <span class="math">\(\mathbf{T}(f)\)</span>. If <code class="docutils literal"><span class="pre">mutates=false</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">t(x)</span></code>. If <code class="docutils literal"><span class="pre">mutates=true</span></code>, then the returned function has the form <code class="docutils literal"><span class="pre">t!(output,</span> <span class="pre">x)</span></code>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="chunk_vec_modes.html" class="btn btn-neutral float-right" title="Chunk-mode vs. Vector-mode" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Installation and Version Requirements" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jarrett Revels, Miles Lubin, Theodore Papamarkou.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
