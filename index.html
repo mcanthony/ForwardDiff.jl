@@ -74,6 +74,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#restrictions-on-the-target-function">Restrictions on the target function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#gradients">Gradients</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#jacobians">Jacobians</a></li>
@@ -98,7 +99,6 @@
 <li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="perf_tips.html">Performance Tips</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul class="simple">
@@ -145,12 +145,12 @@
 <p>ForwardDiff.jl implements methods to take <strong>derivatives</strong>, <strong>gradients</strong>, <strong>Jacobians</strong>, <strong>Hessians</strong>, and higher-order derivatives of native Julia functions (or any callable object, really) using <strong>forward mode automatic differentiation (AD)</strong>.</p>
 <p>While performance can vary depending on the functions you evaluate, the algorithms implemented by ForwardDiff.jl <strong>generally outperform non-AD algorithms in both speed and accuracy.</strong></p>
 <p>This <a class="reference external" href="https://en.wikipedia.org/wiki/Automatic_differentiation">wikipedia page</a> on automatic differentiation is a useful resource for learning about the advantages of AD techniques over other common differentiation methods (such as <a class="reference external" href="https://en.wikipedia.org/wiki/Numerical_differentiation">finite differencing</a>).</p>
-<p>For now, ForwardDiff.jl only supports differentiation of functions involving <code class="docutils literal"><span class="pre">T&lt;:Real</span></code> numbers, but we believe extension to <code class="docutils literal"><span class="pre">T&lt;:Complex</span></code> numbers is possible.</p>
 <div class="toctree-wrapper compound" id="user-documentation">
 <p class="caption"><span class="caption-text">User Documentation</span><a class="headerlink" href="#user-documentation" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#restrictions-on-the-target-function">Restrictions on the target function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#gradients">Gradients</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#jacobians">Jacobians</a></li>
@@ -175,7 +175,6 @@
 <li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="perf_tips.html">Performance Tips</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound" id="developer-documentation">
