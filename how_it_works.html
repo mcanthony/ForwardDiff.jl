@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation and Version Requirements &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  <title>Overview: How ForwardDiff.jl Works &mdash; ForwardDiff.jl 0.1.0 documentation</title>
   
 
   
@@ -31,8 +31,8 @@
 
   
     <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
-        <link rel="next" title="Performing Differentiation" href="perf_diff.html"/>
-        <link rel="prev" title="ForwardDiff.jl" href="index.html"/> 
+        <link rel="next" title="ForwardDiffNumber Types" href="types.html"/>
+        <link rel="prev" title="Caching Options" href="caching.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -72,8 +72,8 @@
           
           
               <p class="caption"><span class="caption-text">User Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Installation and Version Requirements</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#restrictions-on-the-target-function">Restrictions on the target function</a></li>
 <li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
@@ -102,10 +102,29 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">Overview: How ForwardDiff.jl Works</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiffnumber-s"><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> s</a></li>
-<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Overview: How ForwardDiff.jl Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#new-number-types">New Number Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="types.html"><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="types.html#partials-t-c"><code class="docutils literal"><span class="pre">Partials{T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#gradientnumber-n-t-c"><code class="docutils literal"><span class="pre">GradientNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#hessiannumber-n-t-c"><code class="docutils literal"><span class="pre">HessianNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#tensornumber-n-t-c"><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">How to Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#manually-optimizing-unary-functions">Manually Optimizing Unary Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#pick-a-function-to-optimize">1. Pick a function to optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#implementing-new-functions">Implementing New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#via-calculus-jl">Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#manually">Manually</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="why_julia.html">Why Julia?</a></li>
@@ -133,11 +152,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Installation and Version Requirements</li>
+    <li>Overview: How ForwardDiff.jl Works</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/install.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/how_it_works.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -146,13 +165,20 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="installation-and-version-requirements">
-<h1>Installation and Version Requirements<a class="headerlink" href="#installation-and-version-requirements" title="Permalink to this headline">¶</a></h1>
-<p>To install ForwardDiff.jl, simply use Julia&#8217;s package manager:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;ForwardDiff&quot;</span><span class="p">)</span>
-</pre></div>
+  <div class="section" id="overview-how-forwarddiff-jl-works">
+<h1>Overview: How ForwardDiff.jl Works<a class="headerlink" href="#overview-how-forwarddiff-jl-works" title="Permalink to this headline">¶</a></h1>
+<p>As previously stated, ForwardDiff.jl is an implementation of <a class="reference external" href="https://en.wikipedia.org/wiki/Automatic_differentiation">forward mode automatic differentiation</a> (AD) in Julia. There are two key components of this implementation: number types, and the API.</p>
+<div class="section" id="new-number-types">
+<h2>New Number Types<a class="headerlink" href="#new-number-types" title="Permalink to this headline">¶</a></h2>
+<p>ForwardDiff.jl provides several new number types, which are all subtypes of the abstract type <code class="docutils literal"><span class="pre">ForwardDiffNumber{N,T,C}</span> <span class="pre">&lt;:</span> <span class="pre">Number</span></code>. These number types store both normal values, and the values of partial derivatives.</p>
+<p>Elementary numerical functions on these types are overloaded to evaluate both the original function, <em>and</em> evaluate partials derivatives of the function, storing the results in a <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code>. We can then pass these number types into a general function <span class="math">\(f\)</span> (which is assumed to be composed of the overloaded elementary functions), and the derivative information is naturally propogated at each step of the calculation by way of the chain rule.</p>
+<p>This propogation occurs all the way through to the result of the function, which is iself a <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> or an <code class="docutils literal"><span class="pre">Array{ForwardDiffNumber}</span></code>. This number (or array) contains the result <span class="math">\(f(x)\)</span> and the derivative <span class="math">\(f'(x)\)</span>, where <span class="math">\(x\)</span> was the original point of evalutation.</p>
 </div>
-<p>The current version of ForwardDiff.jl only supports Julia v0.4.</p>
+<div class="section" id="forwarddiff-jl-s-api">
+<h2>ForwardDiff.jl&#8217;s API<a class="headerlink" href="#forwarddiff-jl-s-api" title="Permalink to this headline">¶</a></h2>
+<p>The second component provided by this package is the API, which abstracts away the number types and makes it easy to execute familiar calculations (e.g. taking the Jacobian, Hessian, etc.). This way, users don&#8217;t have to understand <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> types in order to make use of the package.</p>
+<p>The API also provides features (like the <code class="docutils literal"><span class="pre">chunk_size</span></code> option) for fine-tuning calculations without having to hack in new implementations of the API methods.</p>
+</div>
 </div>
 
 
@@ -161,10 +187,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="perf_diff.html" class="btn btn-neutral float-right" title="Performing Differentiation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="types.html" class="btn btn-neutral float-right" title="ForwardDiffNumber Types" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="ForwardDiff.jl" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="caching.html" class="btn btn-neutral" title="Caching Options" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

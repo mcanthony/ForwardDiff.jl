@@ -102,7 +102,32 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-<ul class="simple">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">Overview: How ForwardDiff.jl Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#new-number-types">New Number Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="types.html"><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="types.html#partials-t-c"><code class="docutils literal"><span class="pre">Partials{T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#gradientnumber-n-t-c"><code class="docutils literal"><span class="pre">GradientNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#hessiannumber-n-t-c"><code class="docutils literal"><span class="pre">HessianNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#tensornumber-n-t-c"><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">How to Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#manually-optimizing-unary-functions">Manually Optimizing Unary Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#pick-a-function-to-optimize">1. Pick a function to optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#implementing-new-functions">Implementing New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#via-calculus-jl">Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#manually">Manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="why_julia.html">Why Julia?</a></li>
 </ul>
 
           
@@ -247,8 +272,8 @@
 </div>
 <div class="section" id="tensors">
 <h2>Tensors<a class="headerlink" href="#tensors" title="Permalink to this headline">¶</a></h2>
-<p>ForwardDiff.jl can take Tensors of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Vector)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code>.</p>
-<p>&#8220;Tensor&#8221;, in this context, refers to a <span class="math">\(3^{\text{rd}}\)</span> order generalization of the Hessian. Given a function <span class="math">\(f:\mathbb{R}^n \to \mathbb{R}\)</span>, the Tensor operator <span class="math">\(\mathbf{T}\)</span> is defined as</p>
+<p>ForwardDiff.jl can take tensors of functions/callable objects of the form <code class="docutils literal"><span class="pre">f(x::Vector)</span></code> → <code class="docutils literal"><span class="pre">Number</span></code>.</p>
+<p>The word &#8220;tensor&#8221;, in this context, refers to a <span class="math">\(3^{\text{rd}}\)</span> order generalization of the Hessian. Given a function <span class="math">\(f:\mathbb{R}^n \to \mathbb{R}\)</span>, the tensor operator <span class="math">\(\mathbf{T}\)</span> is defined as</p>
 <div class="math">
 \[\mathbf{T}(f) = \sum_{i,j,k=1}^{n} \frac{\delta^3 f}{\delta x_i \delta x_j \delta x_k}\]</div>
 <dl class="function">

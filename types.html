@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ForwardDiffNumber Types &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="How to Contribute" href="contributing.html"/>
+        <link rel="prev" title="Overview: How ForwardDiff.jl Works" href="how_it_works.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="index.html" class="icon icon-home"> ForwardDiff.jl
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#restrictions-on-the-target-function">Restrictions on the target function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#gradients">Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#jacobians">Jacobians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#hessians">Hessians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#tensors">Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chunk_vec_modes.html">Chunk-mode vs. Vector-mode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-are-these-modes">What are these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#how-do-i-use-these-modes">How do I use these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-mode-chunk-size-should-i-use">What mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> should I use?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lower_order_results.html">Accessing Lower-Order Results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-wrong-way">The Wrong Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-right-way">The Right Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#what-you-can-extract-from-a-forwarddiffresult">What You Can Extract from a <code class="docutils literal"><span class="pre">ForwardDiffResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#when-does-caching-matter">When Does Caching Matter?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">Overview: How ForwardDiff.jl Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#new-number-types">New Number Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href=""><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#partials-t-c"><code class="docutils literal"><span class="pre">Partials{T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gradientnumber-n-t-c"><code class="docutils literal"><span class="pre">GradientNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hessiannumber-n-t-c"><code class="docutils literal"><span class="pre">HessianNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tensornumber-n-t-c"><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">How to Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#manually-optimizing-unary-functions">Manually Optimizing Unary Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#pick-a-function-to-optimize">1. Pick a function to optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#implementing-new-functions">Implementing New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#via-calculus-jl">Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#manually">Manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="why_julia.html">Why Julia?</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ForwardDiff.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/types.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="forwarddiffnumber-types">
+<h1><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types<a class="headerlink" href="#forwarddiffnumber-types" title="Permalink to this headline">¶</a></h1>
+<p>You should familiarize yourself with <a class="reference external" href="https://en.wikipedia.org/wiki/Dual_number">dual numbers</a> and <a class="reference external" href="https://adl.stanford.edu/hyperdual/Fike_AIAA-2011-886.pdf">hyper-dual numbers</a> before reading this document.</p>
+<div class="section" id="partials-t-c">
+<h2><code class="docutils literal"><span class="pre">Partials{T,C}</span></code><a class="headerlink" href="#partials-t-c" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">immutable</span> <span class="n">Partials</span><span class="p">{</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">data</span><span class="p">::</span><span class="n">C</span>
+    <span class="n">Partials</span><span class="p">{</span><span class="n">N</span><span class="p">}(</span><span class="n">data</span><span class="p">::</span><span class="n">NTuple</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">})</span> <span class="o">=</span> <span class="nb">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">Partials</span><span class="p">(</span><span class="n">data</span><span class="p">::</span><span class="n">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">})</span> <span class="o">=</span> <span class="nb">new</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">Partials</span></code> type serves as an abstraction over the container type used to store partial derivatives. As you can see, both <code class="docutils literal"><span class="pre">Tuple</span></code> and <code class="docutils literal"><span class="pre">Vector</span></code> types are supported.</p>
+<p>When the number of partial derivatives being stored is small (~10), ForwardDiff stores them in a <code class="docutils literal"><span class="pre">Tuple</span></code>. <code class="docutils literal"><span class="pre">Tuple</span></code> elements are stack-allocated, potentially allowing for very fast operations with little GC overhead.</p>
+<p>When the number of partial derivatives being stored is large enough (greater than ~10), ForwardDiff elects to store them in a heap-allocated <code class="docutils literal"><span class="pre">Vector</span></code>. While operations on vectors can be slower (depending on access patterns), large vectors will not &#8220;clog&#8221; or overflow the stack, as large tuples would.</p>
+</div>
+<div class="section" id="gradientnumber-n-t-c">
+<h2><code class="docutils literal"><span class="pre">GradientNumber{N,T,C}</span></code><a class="headerlink" href="#gradientnumber-n-t-c" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">immutable</span> <span class="n">GradientNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span> <span class="o">&lt;:</span> <span class="n">ForwardDiffNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">value</span><span class="p">::</span><span class="n">T</span>
+    <span class="n">partials</span><span class="p">::</span><span class="n">Partials</span><span class="p">{</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">GradientNumber</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">partials</span><span class="p">::</span><span class="n">Partials</span><span class="p">)</span> <span class="o">=</span> <span class="nb">new</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">partials</span><span class="p">)</span>
+    <span class="n">GradientNumber</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">partials</span><span class="p">::</span><span class="n">Tuple</span><span class="p">)</span> <span class="o">=</span> <span class="nb">new</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Partials</span><span class="p">(</span><span class="n">partials</span><span class="p">))</span>
+    <span class="n">GradientNumber</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">partials</span><span class="p">::</span><span class="n">Vector</span><span class="p">)</span> <span class="o">=</span> <span class="nb">new</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Partials</span><span class="p">(</span><span class="n">partials</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">GradientNumber</span></code> type represents a &#8220;generalized&#8221; dual number. Instead of having a single <span class="math">\(\epsilon\)</span>-component, a generalized dual number has <span class="math">\(N\)</span> <span class="math">\(\epsilon\)</span>-components:</p>
+<div class="math">
+\[g_N = a + \sum_{i=1}^N b_i \epsilon_i\]\[f(g_N) = f(a) + f'(a) \sum_{i=1}^N b_i \epsilon_i\]</div>
+<p>Relating this equation to the above type definition, we have <span class="math">\(a \to\)</span> <code class="docutils literal"><span class="pre">g.value</span></code> and <span class="math">\(b_i \to\)</span> <code class="docutils literal"><span class="pre">g.partials[i]</span></code>. Here&#8217;s what it might look like to overload Julia&#8217;s <code class="docutils literal"><span class="pre">sin</span></code> function on a <code class="docutils literal"><span class="pre">GradientNumber</span></code>:</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> Base</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">GradientNumber</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">v</span><span class="p">,</span> <span class="n">deriv</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">GradientNumber</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">deriv</span><span class="o">*</span><span class="n">g</span><span class="o">.</span><span class="n">partials</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>The actual definition utilizes promotion rules and stricter typing, but you get the idea.</p>
+<p>By setting the appropriate <span class="math">\(b\)</span> values (i.e. the <code class="docutils literal"><span class="pre">partials</span></code> field), we can construct vectors like <span class="math">\(\vec{x}_{g_N}\)</span> below. Passing <span class="math">\(\vec{x}_{g_N}\)</span> to a given function <span class="math">\(f: \mathbb{R}^N \to \mathbb{R}^N\)</span> produces <span class="math">\(f\)</span>&#8216;s directional derivatives evaluated at the original input <span class="math">\(\vec{x}\)</span>:</p>
+<div class="math">
+\[\begin{split}\vec{x} =
+\begin{bmatrix}
+x_1 \\
+\vdots \\
+x_i \\
+\vdots \\
+x_N
+\end{bmatrix} \to
+\vec{x}_{g_N} =
+\begin{bmatrix}
+x_1 + \epsilon_1 \\
+\vdots \\
+x_i + \epsilon_i \\
+\vdots \\
+x_N + \epsilon_N
+\end{bmatrix} \to
+f(\vec{x}_{g_N}) =
+f(\vec{x}) + \sum_{i=1}^N \frac{\delta f(\vec{x})}{\delta x_i} \epsilon_i\end{split}\]</div>
+<p>Alternatively, the <code class="docutils literal"><span class="pre">GradientNumber</span></code> type can be interpreted as an ensemble of <span class="math">\(N\)</span> dual numbers, all sharing the same real component. This interpretation will be the easier one to discuss when we examine the <code class="docutils literal"><span class="pre">HessianNumber</span></code> and <code class="docutils literal"><span class="pre">TensorNumber</span></code> types.</p>
+<p>The tree below visualizes this interpretation. The first level of the tree is given by <code class="docutils literal"><span class="pre">g.value</span></code>, while the second level is comprised of the elements of <code class="docutils literal"><span class="pre">g.partials</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre>g =
+
+   /------------- a
+  /             / | \
+ +       +-----/  +  \-----------+
+ |       |        |              |
+b₁ϵ     b₂ϵ      b₃ϵ     ...   b_N⋅ϵ
+</pre></div>
+</div>
+</div>
+<div class="section" id="hessiannumber-n-t-c">
+<h2><code class="docutils literal"><span class="pre">HessianNumber{N,T,C}</span></code><a class="headerlink" href="#hessiannumber-n-t-c" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">immutable</span> <span class="n">HessianNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span> <span class="o">&lt;:</span> <span class="n">ForwardDiffNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">gradnum</span><span class="p">::</span><span class="n">GradientNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">hess</span><span class="p">::</span><span class="n">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal"><span class="pre">HessianNumber</span></code> can be intepreted as an ensemble of hyper-dual numbers. The representation of an instance of <code class="docutils literal"><span class="pre">HessianNumber{4}</span></code> is visualized by the tree below. The <span class="math">\(a\)</span> and <span class="math">\(b\)</span> values are stored in <code class="docutils literal"><span class="pre">h.gradnum</span></code>, while the <span class="math">\(c\)</span> values are the elements of <code class="docutils literal"><span class="pre">h.hess</span></code>:</p>
+<div class="highlight-none"><div class="highlight"><pre>h =
+    /------------------------------ a
+   /                              / | \
+  +           +------------------/  +  \------------------------+
+  |           |                     |                           |
+ b₁ϵ₁        b₂ϵ₁                  b₃ϵ₁                    --- b₄ϵ₁----
+  |          / \                 /  |  \                  /   /    \   \
+  +         +   +               +   +   +                +   +      +   +
+  |        /     \             /    |    \              /    |      |    \
+ b₁ϵ₂    b₁ϵ₂    b₂ϵ₂        b₁ϵ₂  b₂ϵ₂  b₃ϵ₂         b₁ϵ₂  b₂ϵ₂   b₃ϵ₂  b₄ϵ₂
+  |       |       |          /      |      \          /      |      |      \
+  +       +       +         +       +       +        +       +      +       +
+  |       |       |        /        |        \       |       |      |       |
+c₁ϵ₁ϵ₂  c₂ϵ₁ϵ₂  c₃ϵ₁ϵ₂  c₄ϵ₁ϵ₂    c₅ϵ₁ϵ₂   c₆ϵ₁ϵ₂  c₇ϵ₁ϵ₂  c₈ϵ₁ϵ₂  c₉ϵ₁ϵ₂  c₉ϵ₁ϵ₂
+</pre></div>
+</div>
+<p>Each root-to-leaf path represents an individual hyper-dual number. Labeling the indices of <span class="math">\(b\)</span> values on the <span class="math">\(\epsilon_1\)</span> level with <span class="math">\(i\)</span>, and those on the <span class="math">\(\epsilon_2\)</span> level with <span class="math">\(j\)</span>, the definition for an individual hyper-dual number <span class="math">\(h_{ij}\)</span> (where <span class="math">\(i \geq j\)</span>) in the above tree is:</p>
+<div class="math">
+\[h_{ij} = a + b_i \epsilon_1 + b_j \epsilon_2 + c_{q_{ij}} \epsilon_1 \epsilon_2\]</div>
+<p>where the <span class="math">\(c\)</span> indices are defined as:</p>
+<div class="math">
+\[q_{ij} = \frac{i(i - 1)}{2} + j\]</div>
+<p>The following defines a univariate function evaluation on an individual hyper-dual number:</p>
+<div class="math">
+\[f(h_{ij}) = f(a) + f'(a) b_i \epsilon_1
+                 + f'(a) b_j \epsilon_2
+                 + (f'(a) c_{q_{ij}} + f''(a) b_i b_j) \epsilon_1 \epsilon_2\]</div>
+<p>To illustrate, here&#8217;s the definition for the <span class="math">\(4^{\text{th}}\)</span> hyper-dual number stored in a <code class="docutils literal"><span class="pre">HessianNumber</span></code>:</p>
+<div class="math">
+\[h_4 = a + b_2 \epsilon_1 + b_3 \epsilon_2 + c_4 \epsilon_1 \epsilon_2\]\[f(h_4) = f(a) + f'(a) b_2 \epsilon_1
+              + f'(a) b_3 \epsilon_2
+              + (f'(a) c_4 + f''(a) b_2 b_3) \epsilon_1 \epsilon_2\]</div>
+<p>In general, <span class="math">\(M = \frac{N(N+1)}{2}\)</span> individual hyper-dual numbers are stored by a <code class="docutils literal"><span class="pre">HessianNumber{N}</span></code>. This because that we only need to take <span class="math">\(M\)</span> <span class="math">\(2^{\text{nd}}\)</span>-order derivatives to fully evaluate a symmetric <span class="math">\(N \times N\)</span> Hessian.</p>
+</div>
+<div class="section" id="tensornumber-n-t-c">
+<h2><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code><a class="headerlink" href="#tensornumber-n-t-c" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>AD folks tend to abuse the word &#8220;tensor&#8221;; in this context, it refers to a <span class="math">\(3^{\text{rd}}\)</span> order generalization of the Hessian. Given a function <span class="math">\(f:\mathbb{R}^N \to \mathbb{R}\)</span>, the tensor operator <span class="math">\(\mathbf{T}\)</span> is defined as</p>
+<div class="last math">
+\[\mathbf{T}(f) = \sum_{i,j,k=1}^{N} \frac{\delta^3 f}{\delta x_i \delta x_j \delta x_k}\]</div>
+</div>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">immutable</span> <span class="n">TensorNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span> <span class="o">&lt;:</span> <span class="n">ForwardDiffNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">hessnum</span><span class="p">::</span><span class="n">HessianNumber</span><span class="p">{</span><span class="n">N</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">C</span><span class="p">}</span>
+    <span class="n">tens</span><span class="p">::</span><span class="n">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">TensorNumber</span></code> type is essentially the same as the <code class="docutils literal"><span class="pre">HessianNumber</span></code> type, but with a third <span class="math">\(\epsilon\)</span> component that allows for <span class="math">\(3^{\text{rd}}\)</span>-order derivative accumulation. The paper by Fike and Alonso describing hyper-dual numbers mentions this <span class="math">\(3^{\text{rd}}\)</span>-order variation, but doesn&#8217;t go into too much detail. If you work it out yourself, you find that a <span class="math">\(3^{\text{rd}}\)</span>-order hyper-dual number essentially looks like this:</p>
+<div class="math">
+\[t = t_0 + t_1 \epsilon_1 + t_2 \epsilon_2 + t_3 \epsilon_3 + t_4 \epsilon_1 \epsilon_2 + t_5 \epsilon_1 \epsilon_3 + t_6 \epsilon_2 \epsilon_3 + t_7 \epsilon_1 \epsilon_2 \epsilon_3\]</div>
+<p>The <code class="docutils literal"><span class="pre">TensorNumber</span></code> type stores an ensemble of such numbers. The  type&#8217;s <code class="docutils literal"><span class="pre">tens</span></code> field is used to store the coefficients of the <span class="math">\(\epsilon_1 \epsilon_2 \epsilon_3\)</span> terms (<span class="math">\(t_7\)</span> above). All the other components are contained in the <code class="docutils literal"><span class="pre">hessnum</span></code> field.</p>
+<p>The action of a univariate function <span class="math">\(f\)</span> on an individual <span class="math">\(3^{\text{rd}}\)</span>-order hyper-dual number is defined as:</p>
+<div class="math">
+\[\begin{split}f(t) = &amp; f(t_0) + f'(t_0) \cdot (t_1 ϵ_1 + t_2 ϵ_2 + t_3 ϵ_3 + t_4 ϵ_1 ϵ_2 + t_5 ϵ_1 ϵ_3 + t_6 ϵ_2 ϵ_3 + t_7 ϵ_1 ϵ_2 ϵ_3) + \\
+       &amp; f''(t_0) \cdot (t_1 t_2 ϵ_2 ϵ_1 + t_1 t_3 ϵ_3 ϵ₁ + t_3 t_4 ϵ_2 ϵ_3 ϵ_1 + t_2 t_5 ϵ_2 ϵ_3 ϵ_1 + t_1 t_6 ϵ_2 ϵ_3 ϵ_1 + t_2 t_3 ϵ_2 ϵ_3) + \\
+       &amp; f'''(t_0) \cdot (t_1 t_2 t_3 ϵ_2 ϵ_3 ϵ_1)\end{split}\]</div>
+<p>We can rearrange this to get the new coefficient of the <span class="math">\(\epsilon_1 \epsilon_2 \epsilon_3\)</span> term:</p>
+<div class="math">
+\[f(t)_{\epsilon_1 \epsilon_2 \epsilon_3} = f'(t_0) \cdot t_7 + f''(t_0) \cdot (t_3 t_4 + t_2 t_5 + t_1 t_6) + f'''(t_0) \cdot t_1 t_2 t_3\]</div>
+<p>As was said, the <code class="docutils literal"><span class="pre">TensorNumber</span></code> type is basically a <span class="math">\(3^{\text{rd}}\)</span>-order extension of the previous types - it&#8217;s an ensemble of hyper-dual numbers, and is implemented such that the lower-order partial values are reused where possible. Thus, one could draw the same kind of tree representation for a <code class="docutils literal"><span class="pre">TensorNumber</span></code> instance that is drawn above for the <code class="docutils literal"><span class="pre">HessianNumber</span></code> and <code class="docutils literal"><span class="pre">GradientNumber</span></code> types (though even for <span class="math">\(N=4\)</span>, it&#8217;s too large for us to show here).</p>
+<p>Relating the mathematics to the implementation, here&#8217;s what the indexing structure looks like for an individual number in the <code class="docutils literal"><span class="pre">TensorNumber</span></code> ensemble (where the <span class="math">\(a\)</span>, <span class="math">\(b\)</span>, and <span class="math">\(c\)</span> values are stored in <code class="docutils literal"><span class="pre">t.hessnum</span></code>, while the <span class="math">\(d\)</span> values are stored in <code class="docutils literal"><span class="pre">t.tens</span></code>):</p>
+<div class="math">
+\[t_{N_{ijk}} = a + b_i \epsilon_1 + b_j \epsilon_2 + b_k \epsilon_3 + c_{q_{ij}} \epsilon_1 \epsilon_2 + c_{q_{ik}} \epsilon_1 \epsilon_3 + c_{q_{jk}} \epsilon_2 \epsilon_3 + d_{p_{ijkN}} \epsilon_1 \epsilon_2 \epsilon_3\]</div>
+<p>where</p>
+<div class="math">
+\[1 \leq i \leq N\]\[i \leq j \leq N\]\[i \leq k \leq j\]\[M = \frac{N(N+1)(N+2)}{6}\]\[d_p \in \{d_1, d_2, d_3...d_{M-1}, d_M\}\]\[\begin{split}p_{ijkN} &amp;= \left[\sum_{\alpha=1}^{i-1} \sum_{\beta=\alpha}^{N} \sum_{\gamma=\alpha}^{\beta} 1 \right] + \left[\sum_{\alpha=i}^{j-1} \sum_{\beta=i}^{\alpha} 1 \right] + (k - i + 1) \\\end{split}\]</div>
+<p>This rather complex indexing structure is derived from the loop code written to taken advantage of the tensor&#8217;s tri-fold symmetry. A given tensor <span class="math">\(\mathbf{T}(f)\)</span> is generally symmetric under index order permutation:</p>
+<div class="math">
+\[\mathbf{T}(f)_{ijk} = \mathbf{T}(f)_{ikj} = \mathbf{T}(f)_{jki} = \mathbf{T}(f)_{jik} = \mathbf{T}(f)_{kij} = \mathbf{T}(f)_{kji}\]</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="How to Contribute" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="how_it_works.html" class="btn btn-neutral" title="Overview: How ForwardDiff.jl Works" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jarrett Revels, Theodore Papamarkou, Miles Lubin, and other contributors.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

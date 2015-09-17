@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -9,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  <title>Why Julia? &mdash; ForwardDiff.jl 0.1.0 documentation</title>
   
 
   
@@ -31,7 +30,8 @@
   
 
   
-    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/> 
+    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="How to Contribute" href="contributing.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -101,7 +101,7 @@
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="how_it_works.html">Overview: How ForwardDiff.jl Works</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="how_it_works.html#new-number-types">New Number Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
@@ -114,7 +114,19 @@
 <li class="toctree-l2"><a class="reference internal" href="types.html#tensornumber-n-t-c"><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="why_julia.html">Why Julia?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">How to Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#manually-optimizing-unary-functions">Manually Optimizing Unary Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#pick-a-function-to-optimize">1. Pick a function to optimize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#implementing-new-functions">Implementing New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#via-calculus-jl">Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#manually">Manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Why Julia?</a></li>
 </ul>
 
           
@@ -139,9 +151,11 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+    <li>Why Julia?</li>
       <li class="wy-breadcrumbs-aside">
         
+          
+            <a href="_sources/why_julia.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -150,71 +164,43 @@
 </div>
           <div role="main" class="document">
             
+  <div class="section" id="why-julia">
+<h1>Why Julia?<a class="headerlink" href="#why-julia" title="Permalink to this headline">¶</a></h1>
+<p>If you&#8217;re a newcomer to Julia, you may ask &#8220;What makes Julia so ideal for forward mode AD methods?&#8221; There are several good answers, but the main reason that Julia is desirable is it&#8217;s <strong>multiple dispatch</strong> feature.</p>
+<p>Unlike many other languages, <strong>Julia&#8217;s type-based operator overloading is fast and natural</strong>, and one of the central design tenets of the langauge. This is because Julia is a dynamic, JIT-compiled language - the compiled bytecode of a Julia function is tied directly to the types with which the function is called, so <strong>the compiler can optimize every Julia method for the specific input type at runtime</strong>.</p>
+<p>Here&#8217;s a (somewhat contrived) example that illustrates the flexibility of multiple dispatch:</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">f</span> <span class="p">(</span><span class="n">generic</span> <span class="k">function</span><span class="nf"> with</span> <span class="mi">1</span> <span class="n">method</span><span class="p">)</span>
 
-<h1 id="index">Index</h1>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c"># method f(::Int64) is JIT-compiled and called</span>
+<span class="mf">1.4142135623730951</span>
 
-<div class="genindex-jumpbox">
- <a href="#D"><strong>D</strong></a>
- | <a href="#F"><strong>F</strong></a>
- | <a href="#H"><strong>H</strong></a>
- | <a href="#J"><strong>J</strong></a>
- | <a href="#T"><strong>T</strong></a>
- 
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="nb">im</span><span class="p">)</span> <span class="c"># new method f(::Complex{Int64}) is JIT-compiled and called</span>
+<span class="mf">1.272019649514069</span> <span class="o">+</span> <span class="mf">0.7861513777574233</span><span class="nb">im</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">AbstractString</span><span class="p">)</span> <span class="o">=</span> <span class="s">&quot;√</span><span class="si">$</span><span class="s">x&quot;</span> <span class="c"># if called on some sort of string, do this instead</span>
+<span class="n">f</span> <span class="p">(</span><span class="n">generic</span> <span class="k">function</span><span class="nf"> with</span> <span class="mi">2</span> <span class="n">methods</span><span class="p">)</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">)</span> <span class="c"># new method f(::ASCIIString) is JIT-compiled and called</span>
+<span class="s">&quot;√2&quot;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c"># call the version of f(::Int64) we already compiled</span>
+<span class="mf">1.4142135623730951</span>
+</pre></div>
 </div>
-<h2 id="D">D</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="perf_diff.html#derivative">derivative() (built-in function)</a>, <a href="perf_diff.html#derivative">[1]</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="perf_diff.html#ForwardDiff.gradient">ForwardDiff.gradient() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="H">H</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="perf_diff.html#hessian">hessian() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="J">J</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="perf_diff.html#jacobian">jacobian() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="perf_diff.html#tensor">tensor() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
+<p>So finally, to answer the original question: <strong>Julia&#8217;s multiple dispatch allows us to efficiently overload core Julia methods (e.g.</strong> <code class="docutils literal"><span class="pre">sin</span></code>, <code class="docutils literal"><span class="pre">lgamma</span></code>, <code class="docutils literal"><span class="pre">log</span></code>, <strong>etc.) on</strong> <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> <strong>types to accumulate derivative information.</strong></p>
+</div>
 
 
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="contributing.html" class="btn btn-neutral" title="How to Contribute" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

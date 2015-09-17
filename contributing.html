@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to Contribute &mdash; ForwardDiff.jl 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ForwardDiff.jl 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Why Julia?" href="why_julia.html"/>
+        <link rel="prev" title="ForwardDiffNumber Types" href="types.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="index.html" class="icon icon-home"> ForwardDiff.jl
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <p class="caption"><span class="caption-text">User Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and Version Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perf_diff.html">Performing Differentiation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#restrictions-on-the-target-function">Restrictions on the target function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#derivatives">Derivatives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#gradients">Gradients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#jacobians">Jacobians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#hessians">Hessians</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perf_diff.html#tensors">Tensors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chunk_vec_modes.html">Chunk-mode vs. Vector-mode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-are-these-modes">What are these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#how-do-i-use-these-modes">How do I use these modes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chunk_vec_modes.html#what-mode-chunk-size-should-i-use">What mode/<code class="docutils literal"><span class="pre">chunk_size</span></code> should I use?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lower_order_results.html">Accessing Lower-Order Results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-wrong-way">The Wrong Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#the-right-way">The Right Way</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lower_order_results.html#what-you-can-extract-from-a-forwarddiffresult">What You Can Extract from a <code class="docutils literal"><span class="pre">ForwardDiffResult</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="caching.html">Caching Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#when-does-caching-matter">When Does Caching Matter?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="caching.html#manual-caching">Manual Caching</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="how_it_works.html">Overview: How ForwardDiff.jl Works</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#new-number-types">New Number Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html#forwarddiff-jl-s-api">ForwardDiff.jl&#8217;s API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="types.html"><code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="types.html#partials-t-c"><code class="docutils literal"><span class="pre">Partials{T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#gradientnumber-n-t-c"><code class="docutils literal"><span class="pre">GradientNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#hessiannumber-n-t-c"><code class="docutils literal"><span class="pre">HessianNumber{N,T,C}</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html#tensornumber-n-t-c"><code class="docutils literal"><span class="pre">TensorNumber{N,T,C}</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">How to Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#manually-optimizing-unary-functions">Manually Optimizing Unary Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pick-a-function-to-optimize">1. Pick a function to optimize</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-out-the-function-s-first-second-and-third-derivatives">2. Write out the function&#8217;s first, second, and third derivatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-and-optimize-a-test-function-to-compute-the-derivatives">3. Write and optimize a test function to compute the derivatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implement-the-function-on-the-forwarddiffnumber-types">3. Implement the function on the <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-tests">4. Run Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-new-functions">Implementing New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#via-calculus-jl">Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manually">Manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="why_julia.html">Why Julia?</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ForwardDiff.jl</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>How to Contribute</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/contributing.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="how-to-contribute">
+<h1>How to Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h1>
+<p>There are a few fairly easy ways for newcomers to substantially improve ForwardDiff.jl, and they all revolve around <strong>writing functions for the</strong> <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> <strong>types</strong>. This section provides brief tutorials on how to make these contributions.</p>
+<p>If you&#8217;re new GitHub, here&#8217;s an outline of the workflow you should use:</p>
+<ol class="arabic simple">
+<li>Fork ForwardDiff.jl</li>
+<li>Make a new branch on your fork, named after whatever changes you&#8217;ll be making</li>
+<li>Apply your code changes to the branch on your fork</li>
+<li>When you&#8217;re done, submit a PR to ForwardDiff.jl to merge your fork into ForwardDiff.jl&#8217;s master branch.</li>
+</ol>
+<div class="section" id="manually-optimizing-unary-functions">
+<h2>Manually Optimizing Unary Functions<a class="headerlink" href="#manually-optimizing-unary-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pick-a-function-to-optimize">
+<h3>1. Pick a function to optimize<a class="headerlink" href="#pick-a-function-to-optimize" title="Permalink to this headline">¶</a></h3>
+<p>To see a list of functions to pick from, look at <code class="docutils literal"><span class="pre">ForwardDiff.supported_unary_funcs</span></code>:</p>
+<div class="highlight-julia"><div class="highlight"><pre>julia&gt; using ForwardDiff
+
+julia&gt; ForwardDiff.supported_unary_funcs
+57-element Array{Symbol,1}:
+ :sqrt
+ :cbrt
+ :abs2
+ :inv
+ :log
+ :log10
+ :log2
+ :log1p
+ :exp
+ :exp2
+ :expm1
+ :sin
+ :cos
+ :tan
+ ⋮
+</pre></div>
+</div>
+<p>Some of these functions may have already been manually optimized. To see what functions have already been done, go to <code class="docutils literal"><span class="pre">src/GradientNumber.jl</span></code>, scroll down to the <code class="docutils literal"><span class="pre">Special</span> <span class="pre">Cases</span></code> section, and look at the functions under <code class="docutils literal"><span class="pre">Manually</span> <span class="pre">Optimized</span></code> (further optimizations to these functions are always welcome, if you can come up with something clever).</p>
+</div>
+<div class="section" id="write-out-the-function-s-first-second-and-third-derivatives">
+<h3>2. Write out the function&#8217;s first, second, and third derivatives<a class="headerlink" href="#write-out-the-function-s-first-second-and-third-derivatives" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s say that you wanted to manually optimize the <code class="docutils literal"><span class="pre">sqrt</span></code> function (this function&#8217;s already been done, but is a good example).</p>
+<p>Pretty naively, we can write out the function and its derivatives evaluated at some value <span class="math">\(a\)</span>:</p>
+<div class="math">
+\[\begin{split}y_0 &amp;= \sqrt a \\
+y_1 &amp;= \frac{\delta}{\delta a} \sqrt a = \frac{1}{2 \sqrt a} \\
+y_2 &amp;= \frac{\delta^2}{\delta a^2} \sqrt a = - \frac{1}{4 a^{3/2}} \\
+y_3 &amp;= \frac{\delta^3}{\delta a^3} \sqrt a = - \frac{3}{8 a^{5/2}}\end{split}\]</div>
+</div>
+<div class="section" id="write-and-optimize-a-test-function-to-compute-the-derivatives">
+<h3>3. Write and optimize a test function to compute the derivatives<a class="headerlink" href="#write-and-optimize-a-test-function-to-compute-the-derivatives" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s write the function and derivatives from the previous section in Julia code:</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> sqrt_test</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">deriv1</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+    <span class="n">deriv2</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">^</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">deriv3</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">^</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sqrt_a</span><span class="p">,</span> <span class="n">deriv1</span><span class="p">,</span> <span class="n">deriv2</span><span class="p">,</span> <span class="n">deriv3</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>Now, our goal is to minimize the number of operations used in <code class="docutils literal"><span class="pre">sqrt_test</span></code>. For example, here&#8217;s an optimized version of <code class="docutils literal"><span class="pre">sqrt_test</span></code>:</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> sqrt_test</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">deriv1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">sqrt_a</span>
+    <span class="n">sqrt_a_cb</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">sqrt_a</span>
+    <span class="n">deriv2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span> <span class="o">/</span> <span class="n">sqrt_a_cb</span>
+    <span class="n">deriv3</span> <span class="o">=</span> <span class="mf">0.375</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">sqrt_a_cb</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sqrt_a</span><span class="p">,</span> <span class="n">deriv1</span><span class="p">,</span> <span class="n">deriv2</span><span class="p">,</span> <span class="n">deriv3</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>Note the variable reuse and precomputation of literal values.</p>
+</div>
+<div class="section" id="implement-the-function-on-the-forwarddiffnumber-types">
+<h3>3. Implement the function on the <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> types<a class="headerlink" href="#implement-the-function-on-the-forwarddiffnumber-types" title="Permalink to this headline">¶</a></h3>
+<p>Next, we want to implement the optimized operations from <code class="docutils literal"><span class="pre">sqrt_test</span></code> on all the <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> types (it&#8217;s actually pretty easy).</p>
+<p>Let&#8217;s start with <code class="docutils literal"><span class="pre">GradientNumber</span></code>. Go to <code class="docutils literal"><span class="pre">src/GradientNumber.jl</span></code>, scroll down to the <code class="docutils literal"><span class="pre">Special</span> <span class="pre">Cases</span></code> section, and look at the functions under <code class="docutils literal"><span class="pre">Manually</span> <span class="pre">Optimized</span></code>. We&#8217;re going to add this definition for the <code class="docutils literal"><span class="pre">sqrt</span></code> function (keep in mind that <span class="math">\(a \to\)</span> <code class="docutils literal"><span class="pre">value(g)</span></code>):</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> sqrt</span><span class="p">(</span><span class="n">g</span><span class="p">::</span><span class="n">GradientNumber</span><span class="p">)</span>
+    <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="c"># sqrt_a from sqrt_test</span>
+    <span class="n">deriv</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">sqrt_a</span> <span class="c"># deriv1 from sqrt_test</span>
+    <span class="k">return</span> <span class="n">gradnum_from_deriv</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">sqrt_a</span><span class="p">,</span> <span class="n">deriv</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>The body of the function is mostly just the value and first derivative calculations we&#8217;ve already figured out from writing <code class="docutils literal"><span class="pre">sqrt_test</span></code>. The interesting line is the <code class="docutils literal"><span class="pre">return</span></code> statement; <code class="docutils literal"><span class="pre">gradnum_from_deriv</span></code> takes in the original <code class="docutils literal"><span class="pre">GradientNumber</span></code> (<code class="docutils literal"><span class="pre">g</span></code>), as its first argument, the new <code class="docutils literal"><span class="pre">a</span></code> value (<code class="docutils literal"><span class="pre">qrt_a</span></code>) as it&#8217;s second, and the first derivative as its third. The resulting <code class="docutils literal"><span class="pre">GradientNumber</span></code> is then constructed from this information.</p>
+<p>To define the optimized version of <code class="docutils literal"><span class="pre">sqrt</span></code> on <code class="docutils literal"><span class="pre">HessianNumber</span></code> and <code class="docutils literal"><span class="pre">TensorNumber</span></code>, we basically do the same as the above, adding extra derivatives as necessary.</p>
+<p>In <code class="docutils literal"><span class="pre">src/HessianNumber.jl</span></code>, under the <code class="docutils literal"><span class="pre">Special</span> <span class="pre">Cases</span></code>/<code class="docutils literal"><span class="pre">Manually</span> <span class="pre">Optimized</span></code> section (<span class="math">\(a \to\)</span> <code class="docutils literal"><span class="pre">value(h)</span></code>):</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> sqrt</span><span class="p">(</span><span class="n">h</span><span class="p">::</span><span class="n">HessianNumber</span><span class="p">)</span>
+    <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">h</span><span class="p">))</span>
+    <span class="n">deriv1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">sqrt_a</span>
+    <span class="n">deriv2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">sqrt_a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hessnum_from_deriv</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sqrt_a</span><span class="p">,</span> <span class="n">deriv1</span><span class="p">,</span> <span class="n">deriv2</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>In <code class="docutils literal"><span class="pre">src/TensorNumber.jl</span></code>, under the <code class="docutils literal"><span class="pre">Special</span> <span class="pre">Cases</span></code>/<code class="docutils literal"><span class="pre">Manually</span> <span class="pre">Optimized</span></code> section (<span class="math">\(a \to\)</span> <code class="docutils literal"><span class="pre">value(t)</span></code>):</p>
+<div class="highlight-julia"><div class="highlight"><pre><span class="k">function</span><span class="nf"> sqrt</span><span class="p">(</span><span class="n">t</span><span class="p">::</span><span class="n">TensorNumber</span><span class="p">)</span>
+    <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">value</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="n">deriv1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">sqrt_a</span>
+    <span class="n">sqrt_a_cb</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">sqrt_a</span>
+    <span class="n">deriv2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.25</span> <span class="o">/</span> <span class="n">sqrt_a_cb</span>
+    <span class="n">deriv3</span> <span class="o">=</span> <span class="mf">0.375</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">sqrt_a_cb</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tensnum_from_deriv</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">sqrt_a</span><span class="p">,</span> <span class="n">deriv1</span><span class="p">,</span> <span class="n">deriv2</span><span class="p">,</span> <span class="n">deriv3</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-tests">
+<h3>4. Run Tests<a class="headerlink" href="#run-tests" title="Permalink to this headline">¶</a></h3>
+<p>The functions in <code class="docutils literal"><span class="pre">ForwardDiff.supported_unary_funcs</span></code> are automatically tested as part of ForwardDiff.jl&#8217;s test suite, so you don&#8217;t need to write tests yourself. Go ahead and test your changes by running <code class="docutils literal"><span class="pre">Pkg.test(&quot;ForwardDiff&quot;)</span></code>.</p>
+<p>If everything passes, you can submit a PR to the ForwardDiff.jl repository to share your work!</p>
+</div>
+</div>
+<div class="section" id="implementing-new-functions">
+<h2>Implementing New Functions<a class="headerlink" href="#implementing-new-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="via-calculus-jl">
+<h3>Via Calculus.jl<a class="headerlink" href="#via-calculus-jl" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="manually">
+<h3>Manually<a class="headerlink" href="#manually" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="why_julia.html" class="btn btn-neutral float-right" title="Why Julia?" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="types.html" class="btn btn-neutral" title="ForwardDiffNumber Types" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Jarrett Revels, Theodore Papamarkou, Miles Lubin, and other contributors.
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
