@@ -125,8 +125,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#implementing-new-functions">Implementing New Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#via-calculus-jl">Via Calculus.jl</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#manually">Manually</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unary-functions-via-calculus-jl">Unary Functions Via Calculus.jl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manually-adding-functions-to-forwarddiff-jl">Manually Adding Functions to ForwardDiff.jl</a></li>
 </ul>
 </li>
 </ul>
@@ -183,10 +183,10 @@
 <h2>Manually Optimizing Unary Functions<a class="headerlink" href="#manually-optimizing-unary-functions" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="pick-a-function-to-optimize">
 <h3>1. Pick a function to optimize<a class="headerlink" href="#pick-a-function-to-optimize" title="Permalink to this headline">¶</a></h3>
-<p>To see a list of functions to pick from, look at <code class="docutils literal"><span class="pre">ForwardDiff.supported_unary_funcs</span></code>:</p>
+<p>To see a list of functions to pick from, look at <code class="docutils literal"><span class="pre">ForwardDiff.auto_defined_unary_funcs</span></code>:</p>
 <div class="highlight-julia"><div class="highlight"><pre>julia&gt; using ForwardDiff
 
-julia&gt; ForwardDiff.supported_unary_funcs
+julia&gt; ForwardDiff.auto_defined_unary_funcs
 57-element Array{Symbol,1}:
  :sqrt
  :cbrt
@@ -278,18 +278,26 @@ y_3 &amp;= \frac{\delta^3}{\delta a^3} \sqrt a = - \frac{3}{8 a^{5/2}}\end{split
 </div>
 <div class="section" id="run-tests">
 <h3>4. Run Tests<a class="headerlink" href="#run-tests" title="Permalink to this headline">¶</a></h3>
-<p>The functions in <code class="docutils literal"><span class="pre">ForwardDiff.supported_unary_funcs</span></code> are automatically tested as part of ForwardDiff.jl&#8217;s test suite, so you don&#8217;t need to write tests yourself. Go ahead and test your changes by running <code class="docutils literal"><span class="pre">Pkg.test(&quot;ForwardDiff&quot;)</span></code>.</p>
+<p>The functions in <code class="docutils literal"><span class="pre">ForwardDiff.auto_defined_unary_funcs</span></code> are automatically tested as part of ForwardDiff.jl&#8217;s test suite, so you don&#8217;t need to write tests yourself. Go ahead and test your changes by running <code class="docutils literal"><span class="pre">Pkg.test(&quot;ForwardDiff&quot;)</span></code>.</p>
 <p>If everything passes, you can submit a PR to the ForwardDiff.jl repository to share your work!</p>
 </div>
 </div>
 <div class="section" id="implementing-new-functions">
 <h2>Implementing New Functions<a class="headerlink" href="#implementing-new-functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="via-calculus-jl">
-<h3>Via Calculus.jl<a class="headerlink" href="#via-calculus-jl" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="unary-functions-via-calculus-jl">
+<h3>Unary Functions Via Calculus.jl<a class="headerlink" href="#unary-functions-via-calculus-jl" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to add support for a new function is actually to define a derivative rule for the function in Calculus.jl&#8217;s <a class="reference internal" href="#symbolic-differentiation-code">symbolic differentiation code</a>, which ForwardDiff.jl then uses to generate the function&#8217;s definition on the <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code> types. To accomplish this:</p>
+<ol class="arabic simple">
+<li>Open an issue in ForwardDiff.jl with the title &#8220;Supporting f(x)&#8221; (obviously replacing &#8220;f(x)&#8221;&#8221; with the function you wish to support).</li>
+<li>Open a PR to Calculus.jl that adds the relevant differentiation rule(s) and tests. In the PR&#8217;s description, be sure to mention the relevant ForwardDiff.jl issue such that GitHub links the two.</li>
+<li>Once the PR to Calculus.jl is accepted, we can check to make sure that the function works appropriately in ForwardDiff.jl. If this is the case, then the issue in ForwardDiff</li>
+</ol>
 </div>
-<div class="section" id="manually">
-<h3>Manually<a class="headerlink" href="#manually" title="Permalink to this headline">¶</a></h3>
-</div>
+<div class="section" id="manually-adding-functions-to-forwarddiff-jl">
+<span id="symbolic-differentiation-code"></span><h3>Manually Adding Functions to ForwardDiff.jl<a class="headerlink" href="#manually-adding-functions-to-forwarddiff-jl" title="Permalink to this headline">¶</a></h3>
+<p>The process for manually adding functions to ForwardDiff.jl without going through Calculus.jl is essentially the same as the process for manually optimizing existing functions (documented above). The only additional step is that you&#8217;ll have to manually write tests for the function.</p>
+<p>ForwardDiff.jl&#8217;s <a class="reference internal" href="#existing-test-suite">existing test suite</a> is full of examples demonstrating how to write tests for the package. You&#8217;ll have to add tests for all subtypes of <code class="docutils literal"><span class="pre">ForwardDiffNumber</span></code>. These tests should go under the corresponding files&#8217; &#8220;Special Cases&#8221; section.</p>
+<span class="target" id="existing-test-suite"></span></div>
 </div>
 </div>
 

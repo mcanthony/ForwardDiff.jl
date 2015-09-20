@@ -16,13 +16,13 @@ Manually Optimizing Unary Functions
 1. Pick a function to optimize
 ++++++++++++++++++++++++++++++
 
-To see a list of functions to pick from, look at ``ForwardDiff.supported_unary_funcs``:
+To see a list of functions to pick from, look at ``ForwardDiff.auto_defined_unary_funcs``:
 
 .. code-block:: julia
 
     julia> using ForwardDiff
 
-    julia> ForwardDiff.supported_unary_funcs
+    julia> ForwardDiff.auto_defined_unary_funcs
     57-element Array{Symbol,1}:
      :sqrt
      :cbrt
@@ -133,17 +133,29 @@ In ``src/TensorNumber.jl``, under the ``Special Cases``/``Manually Optimized`` s
 4. Run Tests
 ++++++++++++
 
-The functions in ``ForwardDiff.supported_unary_funcs`` are automatically tested as part of ForwardDiff.jl's test suite, so you don't need to write tests yourself. Go ahead and test your changes by running ``Pkg.test("ForwardDiff")``.
+The functions in ``ForwardDiff.auto_defined_unary_funcs`` are automatically tested as part of ForwardDiff.jl's test suite, so you don't need to write tests yourself. Go ahead and test your changes by running ``Pkg.test("ForwardDiff")``.
 
 If everything passes, you can submit a PR to the ForwardDiff.jl repository to share your work!
 
 Implementing New Functions
 --------------------------
 
-Via Calculus.jl
-+++++++++++++++
+Unary Functions Via Calculus.jl
++++++++++++++++++++++++++++++++
 
-Manually
-++++++++
+The easiest way to add support for a new function is actually to define a derivative rule for the function in Calculus.jl's `symbolic differentiation code`_, which ForwardDiff.jl then uses to generate the function's definition on the ``ForwardDiffNumber`` types. To accomplish this:
 
+1. Open an issue in ForwardDiff.jl with the title "Supporting f(x)" (obviously replacing "f(x)"" with the function you wish to support).
+2. Open a PR to Calculus.jl that adds the relevant differentiation rule(s) and tests. In the PR's description, be sure to mention the relevant ForwardDiff.jl issue such that GitHub links the two.
+3. Once the PR to Calculus.jl is accepted, we can check to make sure that the function works appropriately in ForwardDiff.jl. If this is the case, then the issue in ForwardDiff
 
+.. _`symbolic differentiation code`:  
+
+Manually Adding Functions to ForwardDiff.jl
++++++++++++++++++++++++++++++++++++++++++++
+
+The process for manually adding functions to ForwardDiff.jl without going through Calculus.jl is essentially the same as the process for manually optimizing existing functions (documented above). The only additional step is that you'll have to manually write tests for the function. 
+
+ForwardDiff.jl's `existing test suite`_ is full of examples demonstrating how to write tests for the package. You'll have to add tests for all subtypes of ``ForwardDiffNumber``. These tests should go under the corresponding files' "Special Cases" section.
+
+.. _`existing test suite`:
