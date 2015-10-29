@@ -55,7 +55,7 @@ benches = @benchmarks begin
     end
 
     @benchmarks begin
-        "simple gradient" => benchgrad(ackley,  x, 10)
+        "simple gradient" => benchgrad(ackley,  x, 5)
     end
 
     @tags "toy"
