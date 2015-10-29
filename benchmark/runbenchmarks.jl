@@ -51,6 +51,19 @@ benches = @benchmarks begin
 
 @track tracker begin
     @setup begin
+        x = rand(10)
+    end
+
+    @benchmarks begin
+        "simple gradient" => benchgrad(ackley,  x, 10)
+    end
+
+    @tags "toy"
+end
+
+
+@track tracker begin
+    @setup begin
         funcs = (ackley, rosenbrock, self_weighted_logit)
         xs = (rand(16), rand(32))
         chunks = (ForwardDiff.default_chunk_size,1,16)
