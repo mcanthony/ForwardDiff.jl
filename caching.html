@@ -176,13 +176,13 @@
 <p>If you&#8217;re going to be repeatedly evaluating the gradient/Hessian/etc. of a function, it&#8217;s probably worth it to generate the corresponding method beforehand rather than call <code class="docutils literal"><span class="pre">hessian(f,</span> <span class="pre">x)</span></code> a bunch of times. For example, this:</p>
 <div class="highlight-julia"><div class="highlight"><pre><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">1</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">x</span> <span class="k">in</span> <span class="n">inputs</span>
-    <span class="n">hess</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
     <span class="o">...</span> <span class="c"># do something with hess</span>
 <span class="k">end</span>
 </pre></div>
 </div>
 <p>...should really be written like this:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span class="n">h</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="c"># generate H(f) first</span>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">h</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="c"># generate H(f) first</span>
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">1</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">x</span> <span class="k">in</span> <span class="n">inputs</span>
     <span class="n">hess</span> <span class="o">=</span> <span class="n">h</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -195,11 +195,11 @@
 <div class="section" id="manual-caching">
 <h2>Manual Caching<a class="headerlink" href="#manual-caching" title="Permalink to this headline">¶</a></h2>
 <p>This caching can be handled &#8220;manually&#8221;, if one wishes, by utilizing the provided <code class="docutils literal"><span class="pre">ForwardDiffCache</span></code> type and the <code class="docutils literal"><span class="pre">cache</span></code> keyword argument:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span class="n">my_cache</span> <span class="o">=</span> <span class="n">ForwardDiffCache</span><span class="p">()</span> <span class="c"># make new cache to pass in to our function</span>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">my_cache</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">ForwardDiffCache</span><span class="p">()</span> <span class="c"># make new cache to pass in to our function</span>
 <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="k">in</span> <span class="mi">1</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">x</span> <span class="k">in</span> <span class="n">inputs</span>
     <span class="c"># just as efficient as pre-generating h, because it can reuse my_cache</span>
-    <span class="n">hess</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">my_cache</span><span class="p">)</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">my_cache</span><span class="p">)</span>
     <span class="o">...</span> <span class="c"># do something with hess</span>
 <span class="k">end</span>
 </pre></div>

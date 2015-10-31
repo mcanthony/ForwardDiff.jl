@@ -175,7 +175,7 @@
 <h2>The Wrong Way<a class="headerlink" href="#the-wrong-way" title="Permalink to this headline">¶</a></h2>
 <p>Let&#8217;s say you want to calculate the value, gradient, and Hessian of some function <code class="docutils literal"><span class="pre">f</span></code> at an input <code class="docutils literal"><span class="pre">x</span></code>.</p>
 <p>You might simply do the following:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">ForwardDiff</span>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="k">import</span> <span class="n">ForwardDiff</span>
 
 <span class="c"># a silly example function</span>
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">::</span><span class="n">Vector</span><span class="p">)</span> <span class="o">=</span> <span class="n">sum</span><span class="p">(</span><span class="n">sin</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">prod</span><span class="p">(</span><span class="n">tan</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">sum</span><span class="p">(</span><span class="n">sqrt</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
@@ -192,7 +192,7 @@
   <span class="mf">9.47858</span>
   <span class="mf">9.50792</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">hess</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">hess</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 <span class="mi">4</span><span class="n">x4</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">2</span><span class="p">}:</span>
  <span class="mf">13.082</span>   <span class="mf">21.2597</span>  <span class="mf">21.8144</span>  <span class="mf">21.9039</span>
  <span class="mf">21.2597</span>  <span class="mf">18.9436</span>  <span class="mf">19.0885</span>  <span class="mf">19.1668</span>
@@ -206,7 +206,7 @@
 <h2>The Right Way<a class="headerlink" href="#the-right-way" title="Permalink to this headline">¶</a></h2>
 <p>You can pass the abstract type <code class="docutils literal"><span class="pre">AllResults</span></code> to a differentiation method in order to return a &#8220;package&#8221; of all the lower-order calculations along with the normal result of the method.</p>
 <p>Let&#8217;s use the situation from the previous section as an example. Here&#8217;s the <em>right</em> way to get the Hessian and all the lower-order values:</p>
-<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="n">hess</span><span class="p">,</span> <span class="n">allresults</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">AllResults</span><span class="p">);</span>
+<div class="highlight-julia"><div class="highlight"><pre><span class="n">julia</span><span class="o">&gt;</span> <span class="n">hess</span><span class="p">,</span> <span class="n">allresults</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">AllResults</span><span class="p">);</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">hess</span>
 <span class="mi">4</span><span class="n">x4</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">2</span><span class="p">}:</span>
@@ -215,7 +215,7 @@
  <span class="mf">21.8144</span>  <span class="mf">19.0885</span>  <span class="mf">22.928</span>   <span class="mf">19.6656</span>
  <span class="mf">21.9039</span>  <span class="mf">19.1668</span>  <span class="mf">19.6656</span>  <span class="mf">23.4095</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="n">allresults</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">val</span> <span class="o">=</span> <span class="n">ForwarDiff</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">allresults</span><span class="p">)</span>
 <span class="mf">6.8401101379076685</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">grad</span> <span class="o">=</span> <span class="n">ForwardDiff</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">allresults</span><span class="p">)</span>
